@@ -60,7 +60,7 @@ void MainWindow::on_vidBtn1_clicked()
 
 void MainWindow::on_streamBtn_clicked()
 {
-    //start stream
+    //start streaming in a new thread
     emit sigStream(proc);
     streamThread->start();
 }
