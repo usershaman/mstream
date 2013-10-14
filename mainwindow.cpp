@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // creating the GUI here, widgets and layouts
+
     QWidget *window = new QWidget();
     QGridLayout *gLayout = new QGridLayout;
     QHBoxLayout *hLayout = new QHBoxLayout;
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vidIndex = 0;
     connect(this, SIGNAL(updatePane()), this, SLOT(updateInfo()));
+
 }
 
 MainWindow::~MainWindow()
@@ -54,7 +57,7 @@ void MainWindow::on_vidBtn1_clicked()
 
 void MainWindow::on_streamBtn_clicked()
 {
-    //start stream
+    // Threading for the stream, uses QObject and moves it to a QThread
     QThread* sThread = new QThread;
     strmObject* sObject = new strmObject();
 
@@ -63,4 +66,41 @@ void MainWindow::on_streamBtn_clicked()
     connect(sObject, SIGNAL(finished()), sObject, SLOT(deleteLater()));
     connect(sThread, SIGNAL(finished()), sThread, SLOT(deleteLater()));
     sThread->start();
+}
+
+void MainWindow::on_lineEdit_returnPressed()
+{
+    // Threading for the search, uses QObject and moves it to a QThread
+    QThread* srThread = new QThread;
+    srchObject* srObject = new srchObject();
+
+    srObject->moveToThread(srThread);
+    connect(this, SIGNAL(startSearch(QString*)), srObject, SLOT(getQuery(QString*)));
+    //connect(srThread, SIGNAL(started()), srObject, SLOT(doTask()));
+    connect(srObject, SIGNAL(finished()), srObject, SLOT(deleteLater()));
+    connect(srThread, SIGNAL(finished()), srThread, SLOT(deleteLater()));
+    connect(srObject, SIGNAL(finished()), this, SLOT(parseData()));
+
+    QString* name = new QString();
+    *name = QString(ui->lineEdit->text());
+    emit startSearch(name);
+
+    srThread->start();
+}
+
+void MainWindow::parseData()
+{
+    QFile file("result");
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0, "error", file.errorString());
+    }
+
+    QTextStream in(&file);
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+        qDebug() << line;
+    }
+
+    file.close();
 }
