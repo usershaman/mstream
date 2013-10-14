@@ -14,9 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    stmthread.cpp
+    strmobject.cpp
 
 HEADERS  += mainwindow.h \
-    stmthread.h
+    strmobject.h
 
 FORMS    += mainwindow.ui

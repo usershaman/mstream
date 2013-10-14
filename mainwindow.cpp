@@ -34,12 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vidIndex = 0;
     connect(this, SIGNAL(updatePane()), this, SLOT(updateInfo()));
-
-    streamThread = new stmThread(this);
-    connect(this, SIGNAL(sigStream(QProcess*)), streamThread, SLOT(streamSlot(QProcess*)));
-
-    proc = new QProcess(this);
-
 }
 
 MainWindow::~MainWindow()
@@ -60,7 +54,13 @@ void MainWindow::on_vidBtn1_clicked()
 
 void MainWindow::on_streamBtn_clicked()
 {
-    //start streaming in a new thread
-    emit sigStream(proc);
-    streamThread->start();
+    //start stream
+    QThread* sThread = new QThread;
+    strmObject* sObject = new strmObject();
+
+    sObject->moveToThread(sThread);
+    connect(sThread, SIGNAL(started()), sObject, SLOT(doTask()));
+    connect(sObject, SIGNAL(finished()), sObject, SLOT(deleteLater()));
+    connect(sThread, SIGNAL(finished()), sThread, SLOT(deleteLater()));
+    sThread->start();
 }

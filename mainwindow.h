@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 #include <QProcess>
-
-#include "stmthread.h"
+#include <QThread>
+#include "strmobject.h"
 
 namespace Ui {
 class MainWindow;
@@ -27,12 +27,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
     short vidIndex;
-    stmThread *streamThread;
-    QProcess *proc;
+//    QThread sThread;
+//    strmObject sObject;
 
 signals:
     void updatePane();
-    void sigStream(QProcess*);
 
 };
 
